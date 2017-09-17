@@ -23,7 +23,7 @@ gulp.task('pages', function () {
 
 ## Example Usage
 
-####Block
+#### Block
 ```pug
 .header
 form.search-form
@@ -43,7 +43,7 @@ form.search-form
 
 ***
 
-####Element
+#### Element
 ```pug
 form.search-form
     input._input
@@ -60,8 +60,8 @@ form.search-form
 
 ***
 
-####Modifier
-#####Boolean
+#### Modifier
+##### Boolean
 ```pug
 form.search-form.-focused
     button._button.-disabled Search
@@ -74,7 +74,7 @@ form.search-form.-focused
 </form>
 ```
 
-#####Key-value
+##### Key-value
 ```pug
 form.search-form.-theme_islands
     button._button.-size_m Search
@@ -89,7 +89,7 @@ form.search-form.-theme_islands
 
 ***
 
-####Mix
+#### Mix
 ```pug
 .header
     form.search-form._search-form
@@ -104,7 +104,7 @@ form.search-form.-theme_islands
 
 ***
 
-####Example
+#### Example
 ```pug
 header.header
     nav.menu
@@ -160,7 +160,7 @@ pugbem.m = 'string';
 
 ```
 
-####Example
+#### Example
 ```js
 pugbem.e = '**';
 ```
