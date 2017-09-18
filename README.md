@@ -157,7 +157,6 @@ pugbem.e = 'string';
 
 // modifier separator
 pugbem.m = 'string';
-
 ```
 
 #### Example
