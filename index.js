@@ -62,7 +62,7 @@ function pugbem(tokens) {
                 pos = 1;
                 
                 // ------- Mix -------
-                if (block.tokens.length > 1 && element.line ==  block.tokens[block.tokens.length - 1].line) {
+                if (element.line == block.tokens[block.tokens.length - 1].line && block.tokens.length > 1) {
                     pos = 2;
                 }
                 
