@@ -4,34 +4,26 @@ function pugbem(tokens) {
     var block = {tokens: []},
         element = {},
         tag = {},
-        elem,
-        mod,
+        elem = this.e || '__',
+        mod = this.m || '--',
         pos;
     
     
-    elem = this.e ? this.e : '__';
-    mod = this.m ? this.m : '--';
-    
-    
     function positioning(token) {
-        
         if (token.line == tag.line) {
             return tag.col;
         } else {
             return token.col;
         }
-        
     }
     
     function alignment(col) {
-        
         for (var i = 0, len = block.tokens.length; i < len; i++) {
             if (col <= block.tokens[i].col) {
                 block.tokens.length = i;
                 break;
             }
         }
-        
     }
     
     
@@ -92,7 +84,5 @@ function pugbem(tokens) {
 
 
 module.exports = {
-    
     postLex: pugbem
-    
 }
