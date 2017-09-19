@@ -4,8 +4,8 @@ function pugbem(tokens) {
     var block = {tokens: []},
         element = {},
         tag = {},
-        elem = this.e || '__',
-        mod = this.m || '--',
+        sep_e = this.e || '__',
+        sep_m = this.m || '--',
         pos;
     
     
@@ -59,7 +59,7 @@ function pugbem(tokens) {
                 }
                 
                 if (block.tokens.length) {
-                    token.val = token.val.replace(/^\_\_?/, block.tokens[block.tokens.length - pos].val + elem);
+                    token.val = token.val.replace(/^\_\_?/, block.tokens[block.tokens.length - pos].val + sep_e);
                 }
                 
                 element.val = token.val;
@@ -69,9 +69,9 @@ function pugbem(tokens) {
             else if (token.val.match(/^\-/)) {
                 
                 if (token.line == element.line) {
-                    token.val = token.val.replace(/^\-\-?/, element.val + mod);
+                    token.val = token.val.replace(/^\-\-?/, element.val + sep_m);
                 } else if (block.tokens.length) {
-                    token.val = token.val.replace(/^\-\-?/, block.tokens[block.tokens.length - 1].val + mod);
+                    token.val = token.val.replace(/^\-\-?/, block.tokens[block.tokens.length - 1].val + sep_m);
                 }
                 
             }
