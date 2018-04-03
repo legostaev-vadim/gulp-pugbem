@@ -1,87 +1,100 @@
 function pugbem(tokens) {
     'use strict';
-    
-    var block = {tokens: []},
+
+    let tag = {},
+        block = {},
+        blockArray = [],
         element = {},
-        tag = {},
-        sep_e = this.e || '__',
-        sep_m = this.m || '--',
-        pos;
-    
-    
-    function positioning(token) {
-        if (token.line == tag.line) {
-            return tag.col;
-        } else {
-            return token.col;
-        }
-    }
-    
-    function alignment(col) {
-        for (var i = 0, len = block.tokens.length; i < len; i++) {
-            if (col <= block.tokens[i].col) {
-                block.tokens.length = i;
-                break;
-            }
-        }
-    }
-    
-    
-    tokens.forEach(function (token) {
+        modifier = {},
+        separator = {};
+
+    separator.elem = this.e || '__',
+    separator.mod = this.m || '--';
+
+
+    tokens.forEach(token => {
         
-        if (token.type == 'tag') {
-            tag = token;
-        }
-        
-        if (token.type == 'class') {
-            
-            // ------- Block -------
+        if (token.type === 'tag') {
+
+            tag.line = token.loc.start.line; 
+            tag.column = token.loc.start.column;
+
+        } else if (token.type === 'class') {
+
+            // ----------- if Block -----------
             if (token.val.match(/^[a-zA-Z]/)) {
-                
-                block.col = positioning(token);
-                alignment(block.col);
-                
-                block.tokens.push({line: token.line, col: block.col, val: token.val});
-                
+
+                if (block.line === token.loc.start.line) return;
+
+                block.line = token.loc.start.line;
+                if (block.line === tag.line) block.column = tag.column;
+                else block.column = token.loc.start.column;
+
+                for (let i = 0, length = blockArray.length; i < length; i++) {
+                    if (block.column <= blockArray[i].column) {
+                        blockArray.length = i;
+                        element = {};
+                        modifier = {};
+                        break;
+                    }
+                }
+
+                blockArray.push({line: block.line, column: block.column, val: token.val});
+
             }
-            // ------- Element -------
+            // ----------- if Element -----------
             else if (token.val.match(/^\_/)) {
-                
-                element.col = positioning(token);
-                alignment(element.col);
-                
-                element.line = token.line;
-                pos = 1;
-                
-                // ------- Mix -------
-                if (block.tokens.length > 1 && element.line == block.tokens[block.tokens.length - 1].line) {
-                    pos = 2;
+
+                if (!blockArray.length) return;
+                if (element.line === token.loc.start.line) return;
+
+                element.line = token.loc.start.line;
+                if (element.line === tag.line) element.column = tag.column;
+                else element.column = token.loc.start.column;
+
+                // ----------- the mix -----------
+                if (element.line === blockArray[blockArray.length - 1].line) {
+                    for (const iterator of [...blockArray].reverse()) {
+                        if (element.line !== iterator.line) {
+                            token.val = token.val.replace(/^\_\_?/, iterator.val + separator.elem);
+                            break;
+                        }
+                    }
                 }
-                
-                if (block.tokens.length) {
-                    token.val = token.val.replace(/^\_\_?/, block.tokens[block.tokens.length - pos].val + sep_e);
+                // ----------- the element -----------
+                else {
+                    for (let i = 0, length = blockArray.length; i < length; i++) {
+                        if (element.column <= blockArray[i].column) {
+                            blockArray.length = i;
+                            break;
+                        }
+                    }
+                    if (!blockArray.length) return;
+                    token.val = token.val.replace(/^\_\_?/, blockArray[blockArray.length - 1].val + separator.elem);
                 }
-                
+
                 element.val = token.val;
-                
+
             }
-            // ------- Modifier -------
+            // ----------- if Modifier -----------
             else if (token.val.match(/^\-/)) {
-                
-                if (token.line == element.line) {
-                    token.val = token.val.replace(/^\-\-?/, element.val + sep_m);
-                } else if (block.tokens.length) {
-                    token.val = token.val.replace(/^\-\-?/, block.tokens[block.tokens.length - 1].val + sep_m);
+
+                if (!blockArray.length) return;
+
+                modifier.line = token.loc.start.line;
+
+                if (modifier.line === element.line) {
+                    token.val = token.val.replace(/^\-\-?/, element.val + separator.mod);
+                } else if (modifier.line === blockArray[blockArray.length - 1].line) {
+                    token.val = token.val.replace(/^\-\-?/, blockArray[blockArray.length - 1].val + separator.mod);
                 }
-                
+
             }
         }
-        
     });
-    
+
     return tokens;
 }
-
 
 module.exports = {
     postLex: pugbem
