@@ -93,6 +93,8 @@ function pugbem(tokens) {
                     }
                 }
 
+                if (!blockArray.length) return;
+
                 if (modifier.line === element.line) {
                     token.val = token.val.replace(/^\-\-?/, element.val + separator.mod);
                 } else if (modifier.line === blockArray[blockArray.length - 1].line) {
