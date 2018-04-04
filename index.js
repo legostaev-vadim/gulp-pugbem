@@ -80,8 +80,18 @@ function pugbem(tokens) {
             else if (token.val.match(/^\-/)) {
 
                 if (!blockArray.length) return;
+                if (blockArray.length === 1 && element.line === blockArray[blockArray.length - 1].line) return;
 
                 modifier.line = token.loc.start.line;
+                if (modifier.line === tag.line) modifier.column = tag.column;
+                else modifier.column = token.loc.start.column;
+
+                for (let i = 0, length = blockArray.length; i < length; i++) {
+                    if (modifier.column <= blockArray[i].column) {
+                        blockArray.length = i;
+                        break;
+                    }
+                }
 
                 if (modifier.line === element.line) {
                     token.val = token.val.replace(/^\-\-?/, element.val + separator.mod);
