@@ -1,7 +1,8 @@
 function pugbem(tokens) {
     'use strict';
 
-    let _tag = {},
+    const _tag = {},
+        _token = {},
         _class = {},
         _block = {},
         blocks = [],
@@ -27,10 +28,13 @@ function pugbem(tokens) {
 
         } else if (token.type === 'class') {
 
+            _token.line = token.loc.start.line;
+            _token.column = token.loc.start.column;
+
             if (blocks.length) {
                 
-                _class.line = token.loc.start.line;
-                _class.column = positioning(_class.line, token.loc.start.column);
+                _class.line = _token.line;
+                _class.column = positioning(_class.line, _token.column);
                 
                 if (_class.line !== blocks[blocks.length - 1].line) {
                     for (let i = 0, lgth = blocks.length; i < lgth; i++) {
@@ -46,10 +50,10 @@ function pugbem(tokens) {
             // ----------- if Block -----------
             if (token.val.match(/^[a-zA-Z]/)) {
 
-                if (_block.line === token.loc.start.line) return;
+                if (_block.line === _token.line) return;
 
-                _block.line = token.loc.start.line;
-                _block.column = positioning(_block.line, token.loc.start.column);
+                _block.line = _token.line;
+                _block.column = positioning(_block.line, _token.column);
 
                 blocks.push({line: _block.line, column: _block.column, val: token.val});
 
@@ -58,9 +62,9 @@ function pugbem(tokens) {
             else if (token.val.match(/^\_/)) {
 
                 if (!blocks.length) return;
-                if (_element.line === token.loc.start.line) return;
+                if (_element.line === _token.line) return;
 
-                _element.line = token.loc.start.line;
+                _element.line = _token.line;
 
                 // ----------- the mix -----------
                 if (_element.line === blocks[blocks.length - 1].line) {
@@ -84,7 +88,7 @@ function pugbem(tokens) {
 
                 if (!blocks.length) return;
 
-                _modifier.line = token.loc.start.line;
+                _modifier.line = _token.line;
 
                 if (_modifier.line === _element.line) {
                     token.val = token.val.replace(/^\-\-?/, _element.val + _separator.mod);
