@@ -91,6 +91,7 @@ function pugbem(tokens) {
                 _modifier.line = _token.line;
 
                 if (_modifier.line === _element.line) {
+                    if (blocks.length === 1 && _element.line === blocks[blocks.length - 1].line) return;
                     token.val = token.val.replace(/^\-\-?/, _element.val + _separator.mod);
                 } else if (_modifier.line === blocks[blocks.length - 1].line) {
                     token.val = token.val.replace(/^\-\-?/, blocks[blocks.length - 1].val + _separator.mod);
