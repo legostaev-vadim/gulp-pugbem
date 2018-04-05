@@ -1,93 +1,95 @@
 function pugbem(tokens) {
     'use strict';
 
-    let tag = {},
-        block = {},
-        blockArray = [],
-        element = {},
-        modifier = {},
-        separator = {};
+    let _tag = {},
+        _class = {},
+        _block = {},
+        blocks = [],
+        _element = {},
+        _modifier = {},
+        _separator = {};
 
-    separator.elem = this.e || '__',
-    separator.mod = this.m || '--';
+    _separator.elem = this.e || '__',
+    _separator.mod = this.m || '--';
+
+    function positioning(line, token) {
+        if (line === _tag.line) return _tag.column;
+        return token;
+    }
 
 
     tokens.forEach(token => {
         
         if (token.type === 'tag') {
 
-            tag.line = token.loc.start.line; 
-            tag.column = token.loc.start.column;
+            _tag.line = token.loc.start.line; 
+            _tag.column = token.loc.start.column;
 
         } else if (token.type === 'class') {
+
+            if (blocks.length) {
+                
+                _class.line = token.loc.start.line;
+                _class.column = positioning(_class.line, token.loc.start.column);
+                
+                if (_class.line !== blocks[blocks.length - 1].line) {
+                    for (let i = 0, lgth = blocks.length; i < lgth; i++) {
+                        if (_class.column <= blocks[i].column) {
+                            blocks.length = i;
+                            break;
+                        }
+                    }
+                }
+                
+            }
 
             // ----------- if Block -----------
             if (token.val.match(/^[a-zA-Z]/)) {
 
-                if (block.line === token.loc.start.line) return;
+                if (_block.line === token.loc.start.line) return;
 
-                block.line = token.loc.start.line;
-                if (block.line === tag.line) block.column = tag.column;
-                else block.column = token.loc.start.column;
+                _block.line = token.loc.start.line;
+                _block.column = positioning(_block.line, token.loc.start.column);
 
-                for (let i = 0, length = blockArray.length; i < length; i++) {
-                    if (block.column <= blockArray[i].column) {
-                        blockArray.length = i;
-                        element = {};
-                        modifier = {};
-                        break;
-                    }
-                }
-
-                blockArray.push({line: block.line, column: block.column, val: token.val});
+                blocks.push({line: _block.line, column: _block.column, val: token.val});
 
             }
             // ----------- if Element -----------
             else if (token.val.match(/^\_/)) {
 
-                if (!blockArray.length) return;
-                if (element.line === token.loc.start.line) return;
+                if (!blocks.length) return;
+                if (_element.line === token.loc.start.line) return;
 
-                element.line = token.loc.start.line;
-                if (element.line === tag.line) element.column = tag.column;
-                else element.column = token.loc.start.column;
+                _element.line = token.loc.start.line;
 
                 // ----------- the mix -----------
-                if (element.line === blockArray[blockArray.length - 1].line) {
-                    for (const iterator of [...blockArray].reverse()) {
-                        if (element.line !== iterator.line) {
-                            token.val = token.val.replace(/^\_\_?/, iterator.val + separator.elem);
+                if (_element.line === blocks[blocks.length - 1].line) {
+                    for (const iterator of [...blocks].reverse()) {
+                        if (_element.line !== iterator.line) {
+                            token.val = token.val.replace(/^\_\_?/, iterator.val + _separator.elem);
                             break;
                         }
                     }
                 }
                 // ----------- the element -----------
                 else {
-                    for (let i = 0, length = blockArray.length; i < length; i++) {
-                        if (element.column <= blockArray[i].column) {
-                            blockArray.length = i;
-                            break;
-                        }
-                    }
-                    if (!blockArray.length) return;
-                    token.val = token.val.replace(/^\_\_?/, blockArray[blockArray.length - 1].val + separator.elem);
+                    token.val = token.val.replace(/^\_\_?/,  blocks[blocks.length - 1].val + _separator.elem);
                 }
 
-                element.val = token.val;
+                _element.val = token.val;
 
             }
             // ----------- if Modifier -----------
             else if (token.val.match(/^\-/)) {
 
-                if (!blockArray.length) return;
-                if (blockArray.length === 1 && element.line === blockArray[blockArray.length - 1].line) return;
+                if (!blocks.length) return;
 
-                modifier.line = token.loc.start.line;
+                _modifier.line = token.loc.start.line;
 
-                if (modifier.line === element.line) {
-                    token.val = token.val.replace(/^\-\-?/, element.val + separator.mod);
-                } else if (modifier.line === blockArray[blockArray.length - 1].line) {
-                    token.val = token.val.replace(/^\-\-?/, blockArray[blockArray.length - 1].val + separator.mod);
+                if (_modifier.line === _element.line) {
+                    token.val = token.val.replace(/^\-\-?/, _element.val + _separator.mod);
+                } else if (_modifier.line === blocks[blocks.length - 1].line) {
+                    token.val = token.val.replace(/^\-\-?/, blocks[blocks.length - 1].val + _separator.mod);
                 }
 
             }
