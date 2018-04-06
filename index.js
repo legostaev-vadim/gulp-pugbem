@@ -1,86 +1,80 @@
 function pugbem(tokens) {
     'use strict';
 
-    const _tag = {},
-        _token = {},
-        _class = {},
-        _block = {},
+    let tag_line,
+        tag_column,
+        class_line,
+        class_column,
+        block_line,
         blocks = [],
-        _element = {},
-        _modifier = {},
-        _separator = {};
+        element_line,
+        element_val,
+        separator_elem = this.e || '__',
+        separator_mod = this.m || '--';
 
-    _separator.elem = this.e || '__',
-    _separator.mod = this.m || '--';
 
-    function positioning(line, token) {
-        if (line === _tag.line) return _tag.column;
-        return token;
-    }
-
+    Object.defineProperty(blocks, 'last', {
+        get: function() {
+            if (!this.length) return false;
+            return this[this.length - 1];
+        }
+    });
+    
 
     tokens.forEach(token => {
         
         if (token.type === 'tag') {
 
-            _tag.line = token.loc.start.line; 
-            _tag.column = token.loc.start.column;
+            tag_line = token.loc.start.line; 
+            tag_column = token.loc.start.column;
 
         } else if (token.type === 'class') {
 
-            _token.line = token.loc.start.line;
-            _token.column = token.loc.start.column;
+            class_line = token.loc.start.line;
+            if (class_line === tag_line) class_column = tag_column;
+            else class_column = token.loc.start.column;
 
-            if (blocks.length) {
-                
-                _class.line = _token.line;
-                _class.column = positioning(_class.line, _token.column);
-                
-                if (_class.line !== blocks[blocks.length - 1].line) {
-                    for (let i = 0, lgth = blocks.length; i < lgth; i++) {
-                        if (_class.column <= blocks[i].column) {
-                            blocks.length = i;
-                            break;
-                        }
+            if (class_line !== blocks.last.line) {
+                blocks.forEach((elem, i, arr) => {
+                    if (class_column <= elem.column) {
+                        arr.length = i;
+                        return;
                     }
-                }
-                
+                });
             }
 
             // ----------- if Block -----------
             if (token.val.match(/^[a-zA-Z]/)) {
 
-                if (_block.line === _token.line) return;
+                if (class_line === block_line) return;
 
-                _block.line = _token.line;
-                _block.column = positioning(_block.line, _token.column);
-
-                blocks.push({line: _block.line, column: _block.column, val: token.val});
+                block_line = class_line;
+                blocks.push({line: block_line, column: class_column, val: token.val});
 
             }
             // ----------- if Element -----------
             else if (token.val.match(/^\_/)) {
 
                 if (!blocks.length) return;
-                if (_element.line === _token.line) return;
-
-                _element.line = _token.line;
+                if (class_line === element_line) return;
+                
+                element_line = class_line;
 
                 // ----------- the mix -----------
-                if (_element.line === blocks[blocks.length - 1].line) {
-                    for (const iterator of [...blocks].reverse()) {
-                        if (_element.line !== iterator.line) {
-                            token.val = token.val.replace(/^\_\_?/, iterator.val + _separator.elem);
+                if (element_line === blocks.last.line) {
+                    for (const iter of [...blocks].reverse()) {
+                        if (element_line !== iter.line) {
+                            token.val = token.val.replace(/^\_\_?/, iter.val + separator_elem);
                             break;
                         }
                     }
                 }
                 // ----------- the element -----------
                 else {
-                    token.val = token.val.replace(/^\_\_?/,  blocks[blocks.length - 1].val + _separator.elem);
+                    token.val = token.val.replace(/^\_\_?/,  blocks.last.val + separator_elem);
                 }
 
-                _element.val = token.val;
+                element_val = token.val;
 
             }
             // ----------- if Modifier -----------
@@ -88,13 +82,11 @@ function pugbem(tokens) {
 
                 if (!blocks.length) return;
 
-                _modifier.line = _token.line;
-
-                if (_modifier.line === _element.line) {
-                    if (blocks.length === 1 && _element.line === blocks[blocks.length - 1].line) return;
-                    token.val = token.val.replace(/^\-\-?/, _element.val + _separator.mod);
-                } else if (_modifier.line === blocks[blocks.length - 1].line) {
-                    token.val = token.val.replace(/^\-\-?/, blocks[blocks.length - 1].val + _separator.mod);
+                if (class_line === element_line) {
+                    if (blocks.length === 1 && element_line === blocks.last.line) return;
+                    token.val = token.val.replace(/^\-\-?/, element_val + separator_mod);
+                } else if (class_line === blocks.last.line) {
+                    token.val = token.val.replace(/^\-\-?/, blocks.last.val + separator_mod);
                 }
 
             }
