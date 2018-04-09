@@ -47,6 +47,7 @@ function pugbem(tokens) {
             if (token.val.match(/^[a-zA-Z]/)) {
 
                 if (class_line === block_line) return;
+                if (class_line === element_line) return;
 
                 block_line = class_line;
                 blocks.push({line: block_line, column: class_column, val: token.val});
