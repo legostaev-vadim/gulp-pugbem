@@ -9,6 +9,7 @@ function pugbem(tokens) {
         blocks = [],
         element_line,
         element_val,
+        modifier_line,
         separator_elem = this.e || '__',
         separator_mod = this.m || '--';
 
@@ -48,6 +49,7 @@ function pugbem(tokens) {
 
                 if (class_line === block_line) return;
                 if (class_line === element_line) return;
+                if (class_line === modifier_line) return;
 
                 block_line = class_line;
                 blocks.push({line: block_line, column: class_column, val: token.val});
@@ -82,6 +84,8 @@ function pugbem(tokens) {
             else if (token.val.match(/^\-/)) {
 
                 if (!blocks.length) return;
+
+                modifier_line = class_line;
 
                 if (class_line === element_line) {
                     if (blocks.length === 1 && element_line === blocks.last.line) return;
