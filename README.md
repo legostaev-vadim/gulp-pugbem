@@ -1,12 +1,15 @@
 # gulp-pugbem
+
 A plugin that adds **BEM** shortcuts to **Pug** for **Gulp**
 
 # Install
+
 ```
 npm install gulp-pugbem --save-dev
 ```
 
 ## Setup
+
 ```js
 var gulp = require('gulp');
 var pug = require('gulp-pug');
@@ -23,7 +26,10 @@ gulp.task('pages', function () {
 
 ## Example Usage
 
-#### Block
+### Block
+
+>.block
+
 ```pug
 .header
 form.search-form
@@ -33,6 +39,7 @@ form.search-form
 ```
 
 *result:*
+
 ```html
 <div class="header"></div>
 <form class="search-form"></form>
@@ -43,7 +50,10 @@ form.search-form
 
 ***
 
-#### Element
+### Element
+
+>.\_element
+
 ```pug
 form.search-form
     input._input
@@ -51,6 +61,7 @@ form.search-form
 ```
 
 *result:*
+
 ```html
 <form class="search-form">
     <input class="search-form__input">
@@ -60,27 +71,34 @@ form.search-form
 
 ***
 
-#### Modifier
-##### Boolean
+### Modifier
+
+>.-modifier
+
+#### Boolean
+
 ```pug
 form.search-form.-focused
     button._button.-disabled Search
 ```
 
 *result:*
+
 ```html
 <form class="search-form search-form--focused">
     <button class="search-form__button search-form__button--disabled">Search</button>
 </form>
 ```
 
-##### Key-value
+#### Key-value
+
 ```pug
 form.search-form.-theme_islands
     button._button.-size_m Search
 ```
 
 *result:*
+
 ```html
 <form class="search-form search-form--theme_islands">
     <button class="search-form__button search-form__button--size_m">Search</button>
@@ -89,13 +107,17 @@ form.search-form.-theme_islands
 
 ***
 
-#### Mix
+### Mix
+
+>.block.\_element
+
 ```pug
 .header
     form.search-form._search-form
 ```
 
 *result:*
+
 ```html
 <div class="header">
     <form class="search-form header__search-form"></form>
@@ -104,7 +126,8 @@ form.search-form.-theme_islands
 
 ***
 
-#### Example
+## Example
+
 ```pug
 header.header
     nav.menu
@@ -125,6 +148,7 @@ header.header
 ```
 
 *result:*
+
 ```html
 <header class="header">
     <nav class="menu">
@@ -149,6 +173,7 @@ header.header
 ```
 
 ## Options
+
 ```js
 var pugbem = require('gulp-pugbem');
 
@@ -159,7 +184,8 @@ pugbem.e = 'string';
 pugbem.m = 'string';
 ```
 
-#### Example
+### Example
+
 ```js
 pugbem.e = '**';
 ```
@@ -170,6 +196,7 @@ form.search-form
 ```
 
 *result:*
+
 ```html
 <form class="search-form">
     <input class="search-form**input">
@@ -187,30 +214,15 @@ form.search-form.-focused
 ```
 
 *result:*
+
 ```html
 <form class="search-form search-form++focused"></form>
 ```
 
 ## License
 
-MIT License
+ISC License
 
-Copyright (c) 2017 Legostaev Vadim (*legostaev.vadim@mail.ru*)
+## Author
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Legostaev Vadim (*legostaev.vadim@mail.ru*)
