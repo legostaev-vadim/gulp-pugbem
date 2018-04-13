@@ -77,6 +77,8 @@ form.search-form
 
 #### Boolean
 
+>>.-boolean
+
 ```pug
 form.search-form.-focused
     button._button.-disabled Search
@@ -90,7 +92,9 @@ form.search-form.-focused
 </form>
 ```
 
-#### Key-value
+#### Key\_Value
+
+>>.-key\_value
 
 ```pug
 form.search-form.-theme_islands
