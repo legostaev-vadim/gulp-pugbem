@@ -1,3 +1,9 @@
+const reg_block = /^[a-zA-Z]/,
+    reg_elem = /^\_/,
+    reg_mod = /^\-/,
+    repl_elem = /^\_\_?/,
+    repl_mod = /^\-\-?/;
+
 function pugbem(tokens) {
     'use strict';
 
@@ -13,14 +19,12 @@ function pugbem(tokens) {
         separator_elem = this.e || '__',
         separator_mod = this.m || '--';
 
-
     Object.defineProperty(blocks, 'last', {
         get: function() {
             if (!this.length) return false;
             return this[this.length - 1];
         }
     });
-    
 
     tokens.forEach(token => {
         
@@ -45,7 +49,7 @@ function pugbem(tokens) {
             }
 
             // ----------- if Block -----------
-            if (token.val.match(/^[a-zA-Z]/)) {
+            if (token.val.match(reg_block)) {
 
                 if (class_line === block_line) return;
                 if (class_line === element_line) return;
@@ -56,7 +60,7 @@ function pugbem(tokens) {
 
             }
             // ----------- if Element -----------
-            else if (token.val.match(/^\_/)) {
+            else if (token.val.match(reg_elem)) {
 
                 if (!blocks.length) return;
                 if (class_line === element_line) return;
@@ -67,21 +71,21 @@ function pugbem(tokens) {
                 if (element_line === blocks.last.line) {
                     for (const iter of [...blocks].reverse()) {
                         if (element_line !== iter.line) {
-                            token.val = token.val.replace(/^\_\_?/, iter.val + separator_elem);
+                            token.val = token.val.replace(repl_elem, iter.val + separator_elem);
                             break;
                         }
                     }
                 }
                 // ----------- the element -----------
                 else {
-                    token.val = token.val.replace(/^\_\_?/,  blocks.last.val + separator_elem);
+                    token.val = token.val.replace(repl_elem,  blocks.last.val + separator_elem);
                 }
 
                 element_val = token.val;
 
             }
             // ----------- if Modifier -----------
-            else if (token.val.match(/^\-/)) {
+            else if (token.val.match(reg_mod)) {
 
                 if (!blocks.length) return;
 
@@ -89,9 +93,9 @@ function pugbem(tokens) {
 
                 if (class_line === element_line) {
                     if (blocks.length === 1 && element_line === blocks.last.line) return;
-                    token.val = token.val.replace(/^\-\-?/, element_val + separator_mod);
+                    token.val = token.val.replace(repl_mod, element_val + separator_mod);
                 } else if (class_line === blocks.last.line) {
-                    token.val = token.val.replace(/^\-\-?/, blocks.last.val + separator_mod);
+                    token.val = token.val.replace(repl_mod, blocks.last.val + separator_mod);
                 }
 
             }
