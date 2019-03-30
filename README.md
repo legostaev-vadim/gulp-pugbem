@@ -2,6 +2,9 @@
 
 A plugin that adds **BEM** shortcuts to **Pug** for **Gulp**
 
++ [BEM](https://en.bem.info/methodology/quick-start/)
++ [for Bootstrap](https://github.com/legostaev-vadim/gulp-pugbem/issues/1)
+
 # Install
 
 ```
