@@ -5,6 +5,131 @@ A plugin that adds **BEM** shortcuts to **Pug** for **Gulp**
 - **[BEM](https://en.bem.info/methodology/quick-start/)**
 - **[for Bootstrap](https://github.com/legostaev-vadim/gulp-pugbem/issues/1)**
 
+# New!
+
+Now you can specify your own prefixes for blocks in the **b** property:
+
+```js
+var pugbem = require('gulp-pugbem');
+
+// block prefix
+pugbem.b = 'my-';
+
+// or default 'b-'
+pugbem.b = true;
+```
+
+The prefix name can consist of letters, numbers, underscores, and hyphens. After that, only classes that begin with your prefix will be considered when parsing the **BEM** blocks. Classes of blocks without a prefix will be skipped at any depth of nesting elements. This will solve the problem associated with the use of external css-libraries, such as Bootstrap, with a large depth of nesting elements. For example:
+
+**no prefix:**
+
+*test.pug*
+
+```pug
+.block
+  .row
+    .col-lg-8.col-xl-4
+      .row
+        .col-lg-8.col-xl-3
+          ._elem1
+    .col-lg-4.col-xl-8
+      ._elem2
+```
+
+*will be compiled to:*
+
+```html
+<div class="block">
+  <div class="row">
+    <div class="col-lg-8 col-xl-4">
+      <div class="row">
+        <div class="col-lg-8 col-xl-3">
+          <!-- the block is the closest parent element with the class 'col-lg-8' in the file 'test.pug' -->
+          <div class="col-lg-8__elem1"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-xl-8">
+      <!-- the block is the closest parent element with the class 'col-lg-4' in the file 'test.pug' -->
+      <div class="col-lg-4__elem2"></div>
+    </div>
+  </div>
+</div>
+```
+
+**user prefix:**
+
+*gulpfile.js*
+
+```js
+var pugbem = require('gulp-pugbem');
+pugbem.b = true // default 'b-'
+```
+
+*test.pug*
+
+```pug
+//- add prefix to block name
+.b-block
+  .row
+    .col-lg-8.col-xl-4
+      .row
+        .col-lg-8.col-xl-3
+          ._elem1
+    .col-lg-4.col-xl-8
+      ._elem2
+```
+
+*will be compiled to:*
+
+```html
+<!-- user prefix will not fall into the final html -->
+<div class="block">
+  <div class="row">
+    <div class="col-lg-8 col-xl-4">
+      <div class="row">
+        <div class="col-lg-8 col-xl-3">
+         <!-- the block is an element with the prefix 'b-' in the file 'test.pug' -->
+          <div class="block__elem1"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-xl-8">
+      <!-- the block is an element with the prefix 'b-' in the file 'test.pug' -->
+      <div class="block__elem2"></div>
+    </div>
+  </div>
+</div>
+```
+
+**another example:**
+
+```pug
+//- when using custom prefixes, they must be added to the name of each BEM block.
+//- block classes without a prefix are not taken into account in the BEM namespace when compiling!
+.b-block1
+  .class1.class2
+    .class3
+      ._elem1
+    .b-block2
+      ._elem2
+```
+
+*will be compiled to:*
+
+```html
+<div class="block1">
+  <div class="class1 class2">
+    <div class="class3">
+      <div class="block1__elem1"></div>
+    </div>
+    <div class="block2">
+      <div class="block2__elem2"></div>
+    </div>
+  </div>
+</div>
+```
+
 # Install
 
 ```

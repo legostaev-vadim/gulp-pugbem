@@ -1,4 +1,4 @@
-const reg_block = /^[a-zA-Z]/,
+let reg_block = /^[a-zA-Z]/,
     reg_elem = /^\_/,
     reg_mod = /^\-/,
     repl_elem = /^\_\_?/,
@@ -16,8 +16,14 @@ function pugbem(tokens) {
         element_line,
         element_val,
         modifier_line,
+        prefix_block,
         separator_elem = this.e || '__',
         separator_mod = this.m || '--';
+
+    if(this.b === true) prefix_block = 'b-';
+    else if (this.b) prefix_block = this.b;
+
+    if(prefix_block) reg_block = new RegExp(`^${prefix_block}`);
 
     Object.defineProperty(blocks, 'last', {
         get: function() {
@@ -36,6 +42,7 @@ function pugbem(tokens) {
         } else if (token.type === 'class') {
 
             class_line = token.loc.start.line;
+            
             if (class_line === tag_line) class_column = tag_column;
             else class_column = token.loc.start.column;
 
@@ -54,6 +61,8 @@ function pugbem(tokens) {
                 if (class_line === block_line) return;
                 if (class_line === element_line) return;
                 if (class_line === modifier_line) return;
+
+                if(prefix_block) token.val = token.val.replace(reg_block, '');
 
                 block_line = class_line;
                 blocks.push({line: block_line, column: class_column, val: token.val});
