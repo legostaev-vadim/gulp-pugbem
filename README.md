@@ -23,7 +23,6 @@ pugbem.b = 'my-';
 pugbem.b = true;
 ```
 
-
 The prefix name can consist of letters, numbers, underscores, and hyphens. After that, only classes that begin with your prefix will be considered when parsing the **BEM** blocks. Classes of blocks without a prefix will be skipped at any depth of nesting elements. This will solve the problem associated with the use of external css-libraries, such as Bootstrap, with a large depth of nesting elements. For example:
 
 **no prefix:**
